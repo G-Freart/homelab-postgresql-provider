@@ -1,0 +1,12 @@
+- import_playbook: 01_kvm_host__configuration_checking.yaml
+- import_playbook: 02_kvm_host__setup.yaml
+- import_playbook: 03_kvm_host__libvirt_create_resource.yaml
+- import_playbook: 04_kvm_host__libvirt_get_iso.yaml
+- import_playbook: 05_kvm_host__dns_guest_network_setup.yaml
+- import_playbook: 06_kvm_host__cloud_instance_settings.yaml
+- import_playbook: 07_kvm_host__generate_ssh_key.yaml
+- import_playbook: 08_kvm_host__node_provisioning.yaml
+- import_playbook: 09_kvm_host__load_balancer_provisioning.yaml
+- import_playbook: 10_kvm_host__check_provisionning.yaml
+- import_playbook: 11_kvm_guest__prerequisites.yaml
+- import_playbook: 12_kvm_guest__load_balancer_setup.yaml

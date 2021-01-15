@@ -1,0 +1,267 @@
+#
+# Cluster topology definitions related to Ubuntu 20.04
+#
+definition:
+  "u2004-cont-fl-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-cont-fl-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-cont-ca-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-cont-ca-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-crio-fl-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-crio-fl-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-crio-ca-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-crio-ca-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-dock-fl-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-dock-fl-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-dock-ca-ha":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u2004-dock-ca-ng":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab

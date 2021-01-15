@@ -1,0 +1,1 @@
+server=/{{ clusters.definition[cluster_name].network.domain }}/{{ clusters.definition[cluster_name].network.network_cidr | next_nth_usable(1) }}

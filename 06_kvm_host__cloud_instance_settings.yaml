@@ -1,0 +1,38 @@
+- name: This playbook creates settings of the cloud instance
+  hosts: kvm_host
+
+  vars_files:
+    - vars/default-settings.yaml
+    
+  tasks:
+
+    - name: "Cloud instance setting -- Computing instance directory"
+      set_fact:
+        instance_dir: "instances/{{ lookup('file', '/var/lib/dbus/machine-id') }}"
+        
+    - name: "Cloud instance setting -- Creating ssh key directory"
+      file:
+        path:            "{{ instance_dir }}/{{ cluster_name }}/sshkey/"
+        state:           directory
+
+    - name: "Cloud instance setting -- Creating inventory directory"
+      file:
+        path:            "{{ instance_dir }}/{{ cluster_name }}/inventory/"
+        state:           directory
+
+    - name: "Cloud instance setting -- Creating terraform directory"
+      file:
+        path:            "{{ item }}"
+        state:           directory
+      loop:
+        - "{{ instance_dir }}/{{ cluster_name }}/terraform/node"
+        - "{{ instance_dir }}/{{ cluster_name }}/terraform/load_balancer"
+
+    - name: "Cloud instance setting -- Copying terraform templates"
+      copy:
+        src:             "templates/terraform/"
+        dest:            "{{ item }}"
+        remote_src:      true
+      loop:
+        - "{{ instance_dir }}/{{ cluster_name }}/terraform/node"
+        - "{{ instance_dir }}/{{ cluster_name }}/terraform/load_balancer"

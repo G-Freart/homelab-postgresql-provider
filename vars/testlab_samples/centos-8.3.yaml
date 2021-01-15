@@ -1,0 +1,267 @@
+#
+# Cluster topology definitions related to CentOS 8.3
+#
+definition:
+  "c83-cont-fl-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-cont-fl-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-cont-ca-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-cont-ca-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-crio-fl-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-crio-fl-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-crio-ca-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-crio-ca-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-dock-fl-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-dock-fl-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-dock-ca-ha":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "c83-dock-ca-ng":
+
+    guest_os:           'CentOS 8.3'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            eth0
+      network_cidr:     192.168.3.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab

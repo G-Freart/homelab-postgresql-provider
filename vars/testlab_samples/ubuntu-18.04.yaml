@@ -1,0 +1,267 @@
+#
+# Cluster topology definitions related to Ubuntu 18.04
+#
+definition:
+  "u1804-cont-fl-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-cont-fl-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-cont-ca-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-cont-ca-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-crio-fl-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-crio-fl-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-crio-ca-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-crio-ca-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-dock-fl-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-dock-fl-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-dock-ca-ha":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab
+
+  "u1804-dock-ca-ng":
+
+    guest_os:           'Ubuntu 18.04'
+
+    nodes:
+      vms:              2
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              2
+      disk:             20
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.150.0/24
+      domain:           k8s.testlab
+      bridge:           k8s-testlab

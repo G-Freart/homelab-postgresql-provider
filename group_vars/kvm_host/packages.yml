@@ -1,0 +1,23 @@
+kvm_host_packages:
+  'Ubuntu 20.04':
+    - make
+    - gcc
+    - curl
+    - unzip
+    - golang
+    - python3-lxml
+    - python3-netaddr
+    - python3-libvirt
+    - libvirt-dev
+      
+  'CentOS 8':
+    - make
+    - gcc
+    - curl
+    - unzip
+    - golang
+    - python3-lxml
+    - python3-netaddr
+    - python3-libvirt
+    - libvirt-devel
+      

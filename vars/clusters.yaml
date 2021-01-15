@@ -1,0 +1,27 @@
+#
+# Within this file, you can define your cluster definition
+#
+definition:
+
+  "sagittarius":
+
+    guest_os:           'Ubuntu 20.04'
+
+    nodes:
+      vms:              3
+      vcpu:             3
+      mem:              12
+      disk:             60
+
+    load_balancers:
+      vms:              1
+      vcpu:             2
+      mem:              4
+      disk:             30
+
+    network:
+      iface:            ens3
+      network_cidr:     192.168.1.0/24
+      domain:           homelab
+      bridge:           homelab
+
