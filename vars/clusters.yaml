@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
 #
 # Within this file, you can define your cluster definition
 #
@@ -9,13 +17,13 @@ definition:
 
     nodes:
       vms:              3
-      vcpu:             3
-      mem:              12
+      vcpu:             4
+      mem:              16
       disk:             60
 
     load_balancers:
       vms:              1
-      vcpu:             2
+      vcpu:             1
       mem:              4
       disk:             30
 

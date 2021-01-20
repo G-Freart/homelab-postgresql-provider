@@ -1,0 +1,33 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+#
+# ETCD Cluster settings
+#
+ETCD_INITIAL_CLUSTER_TOKEN="etcd-{{ cluster_name }}"
+ETCD_DATA_DIR="/var/lib/etcd/default.etcd"
+
+#
+# ETCD Node related settings
+#
+{% for host in groups['nodes'] %}{% if inventory_hostname == hostvars[host].inventory_hostname %}
+ETCD_NAME="{{ "etcd%02d" | format (loop.index) }}"
+ETCD_LISTEN_PEER_URLS="http://{{ hostvars[host].ansible_default_ipv4.address }}:2380"
+ETCD_LISTEN_CLIENT_URLS="http://{{ hostvars[host].ansible_default_ipv4.address }}:2379,http://127.0.0.1:2379"
+ETCD_INITIAL_ADVERTISE_PEER_URLS="http://{{ hostvars[host].ansible_default_ipv4.address }}:2380"
+ETCD_ADVERTISE_CLIENT_URLS="http://{{ hostvars[host].ansible_default_ipv4.address }}:2379"
+{% endif %}{% endfor %}
+
+#
+# boostraping cluster configuration
+#
+ETCD_INITIAL_CLUSTER_STATE="new"
+ETCD_INITIAL_CLUSTER="{%- for host in groups['nodes'] -%}
+{{ "etcd%02d" | format (loop.index) }}=http://{{ hostvars[host].ansible_default_ipv4.address }}:2380{% if not loop.last %},{% endif %}
+{%- endfor -%}"
+

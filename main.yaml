@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
 - import_playbook: 01_kvm_host__configuration_checking.yaml
 - import_playbook: 02_kvm_host__setup.yaml
 - import_playbook: 03_kvm_host__libvirt_create_resource.yaml
@@ -10,3 +18,6 @@
 - import_playbook: 10_kvm_host__check_provisionning.yaml
 - import_playbook: 11_kvm_guest__prerequisites.yaml
 - import_playbook: 12_kvm_guest__load_balancer_setup.yaml
+- import_playbook: 13_kvm_guest__etc_setup.yaml  
+- import_playbook: 14_kvm_guest__postgresql_install.yaml
+- import_playbook: 15_kvm_guest__patroni_setup.yaml

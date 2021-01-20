@@ -1,0 +1,45 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+patroni_packages:
+  "Ubuntu 20.04":
+    apt_list:
+      - { state: "present", name: "python3"                 }  
+      - { state: "present", name: "python3-pip"             }  
+    patroni_install_cmd:
+      - pip3 install --upgrade pip setuptools
+      - pip3 install patroni
+      - pip3 install patroni[etcd]
+
+  "Ubuntu 20.10":
+    apt_list:
+      - { state: "present", name: "python3"                 }  
+      - { state: "present", name: "python3-pip"             }  
+    patroni_install_cmd:
+      - pip3 install --upgrade pip setuptools
+      - pip3 install patroni
+      - pip3 install patroni[etcd]
+
+  "CentOS 7":
+    yum_list:
+      - { state: "present", name: "python3"                 }  
+      - { state: "present", name: "python3-pip"             }  
+    patroni_install_cmd:
+      - pip3 install --upgrade pip setuptools
+      - pip3 install patroni
+      - pip3 install patroni[etcd]
+
+  "CentOS 8 Stream":
+    yum_list:
+      - { state: "present", name: "python3"                 }  
+      - { state: "present", name: "python3-pip"             }  
+    patroni_install_cmd:
+      - pip3 install --upgrade pip setuptools
+      - pip3 install patroni
+      - pip3 install patroni[etcd]
+

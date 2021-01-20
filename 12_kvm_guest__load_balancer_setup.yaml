@@ -1,3 +1,11 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
 - name: This playbook will configure the load balancer VMs
   hosts: load_balancers
 
@@ -13,26 +21,10 @@
           include_vars:
             file:        vars/testlab_samples/centos-7.yaml
             name:        c7x
-        - name: Loading CentOS 8.1 cluster samples
-          include_vars:
-            file:        vars/testlab_samples/centos-8.1.yaml
-            name:        c81
-        - name: Loading CentOS 8.2 cluster samples
-          include_vars:
-            file:        vars/testlab_samples/centos-8.2.yaml
-            name:        c82
-        - name: Loading CentOS 8.3 cluster samples
-          include_vars:
-            file:        vars/testlab_samples/centos-8.3.yaml
-            name:        c83
         - name: Loading CentOS 8 Stream cluster samples
           include_vars:
             file:        vars/testlab_samples/centos-8-stream.yaml
             name:        c8s
-        - name: Loading Ubuntu 18.04 cluster samples
-          include_vars:
-            file:        vars/testlab_samples/ubuntu-18.04.yaml
-            name:        u1804
         - name: Loading Ubuntu 20.04 cluster samples
           include_vars:
             file:        vars/testlab_samples/ubuntu-20.04.yaml
@@ -47,11 +39,11 @@
             name:        custo
         - name: Merging all cluster definitions
           set_fact:
-            clusters: "{{ custo | combine(c7x, recursive=True) | combine(c81, recursive=True) | combine(c82, recursive=True) | combine(c83, recursive=True) | combine(c8s, recursive=True) | combine(u1804, recursive=True) | combine(u2004, recursive=True) | combine(u2010, recursive=True) }}"
+            clusters: "{{ custo | combine(c7x, recursive=True) | combine(c8s, recursive=True) | combine(u2004, recursive=True) | combine(u2010, recursive=True) }}"
 
     - name:  Load Balancer setup -- Current provisioning facts of the VMs 
       debug:
-        var: ansible_local['homelab-postgresql-ha']
+        var: ansible_local['homelab-postgresql-provider']
 
     - name:  Load balancer setup -- Configure load balancer VMs
       block:
@@ -213,7 +205,7 @@
             echo 'OPTIONS="
             -f /etc/haproxy/00_haproxy_main.cfg 
             -f /etc/haproxy/01_haproxy_stats.cfg 
-            >> {{ cloud_images[clusters.definition[cluster_name].guest_os].haproxy_extra_arg_file }}
+            "' >> {{ cloud_images[clusters.definition[cluster_name].guest_os].haproxy_extra_arg_file }}
           when:        ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
           become:      true
 
@@ -282,19 +274,17 @@
           when: (reboot_required is defined and reboot_required.stat is defined and reboot_required.stat.exists)
              or (needs_restarting is defined and needs_restarting.rc is defined and needs_restarting.rc != 0)
 
-        - name: Load balancer setup -- Storing new state inside the homelab-postgresql-ha custom fact
+        - name: Load balancer setup -- Storing new state inside the homelab-postgresql-provider custom fact
           lineinfile:
-            path:   /etc/ansible/facts.d/homelab-postgresql-ha.fact
+            path:   /etc/ansible/facts.d/homelab-postgresql-provider.fact
             line:   "load_balancer=haproxy"
           become:   true
 
-        - name: Load balancer setup -- Reload the homelab-postgresql-ha custom fact
+        - name: Load balancer setup -- Reload the homelab-postgresql-provider custom fact
           setup:
             filter: ansible_local          
 
       when: 
         - clusters.definition[cluster_name].nodes.vms > 1
         - load_balancer_packages[clusters.definition[cluster_name].guest_os] is defined
-        - load_balancer_packages[clusters.definition[cluster_name].guest_os].supported is defined
-        - load_balancer_packages[clusters.definition[cluster_name].guest_os].supported == True
-        - ansible_local['homelab-postgresql-ha']['setup']['load_balancer'] is not defined
+        - ansible_local['homelab-postgresql-provider']['setup']['load_balancer'] is not defined

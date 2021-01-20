@@ -6,29 +6,24 @@
 #                                                                                            #
 # ------------------------------------------------------------------------------------------ #
 
-#
-# Cluster topology definitions related to CentOS 7
-#
-definition:
-  "c7x-postgresql-ha":
+etcd_packages:
+  "Ubuntu 20.04":
+    supported:                  True
+    apt_list:
+      - { state: "present", name: "etcd"                    }  
 
-    guest_os:           'CentOS 7'
+  "Ubuntu 20.10":
+    supported:                  True
+    apt_list:
+      - { state: "present", name: "etcd"                    }  
 
-    nodes:
-      vms:              2
-      vcpu:             2
-      mem:              2
-      disk:             20
+  "CentOS 7":
+    supported:                  True
+    yum_list:
+      - { state: "present", name: "etcd"                    }  
 
-    load_balancers:
-      vms:              1
-      vcpu:             2
-      mem:              2
-      disk:             20
-
-    network:
-      iface:            eth0
-      network_cidr:     192.168.151.0/24
-      domain:           pgsql.testlab
-      bridge:           pgsql-testlab
+  "CentOS 8 Stream":
+    supported:                  True
+    yum_list:
+      - { state: "present", name: "etcd"                    }  
 

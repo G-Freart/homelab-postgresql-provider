@@ -1,0 +1,187 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+- name:     This playbook will install patroni on each nodes
+  hosts:    nodes
+
+  vars_files:
+    - vars/default-settings.yaml
+    - group_vars/kvm_guest/cloud_images.yaml
+    - group_vars/kvm_guest/patroni_packages.yaml
+    
+  tasks:
+
+    - block:
+        - name: Loading CentOS 7 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/centos-7.yaml
+            name:        c7x
+        - name: Loading CentOS 8 Stream cluster samples
+          include_vars:
+            file:        vars/testlab_samples/centos-8-stream.yaml
+            name:        c8s
+        - name: Loading Ubuntu 20.04 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/ubuntu-20.04.yaml
+            name:        u2004
+        - name: Loading Ubuntu 20.10 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/ubuntu-20.10.yaml
+            name:        u2010
+        - name: Loading Your custom cluster definition
+          include_vars:
+            file:        vars/clusters.yaml
+            name:        custo
+        - name: Merging all cluster definitions
+          set_fact:
+            clusters: "{{ custo | combine(c7x, recursive=True) | combine(c8s, recursive=True) | combine(u2004, recursive=True) | combine(u2010, recursive=True) }}"
+
+    - name:  Patroni setup -- Current provisioning facts of the VMs 
+      debug:
+        var: ansible_local['homelab-postgresql-provider']
+
+    - name: Patroni setup -- Computing instance directory
+      set_fact:
+        instance_dir: "instances/{{ lookup('file', '/var/lib/dbus/machine-id') }}"
+        
+    - name:  Patroni setup -- Configure nodes
+      block:
+
+        - name: Patroni setup -- Processing Red-Hat like VM
+          block:
+            - name: Patroni setup -- Applying yum package
+              yum:
+                name:   "{{ item.name }}"
+                state:  "{{ item.state }}"
+              loop:     "{{  patroni_packages[clusters.definition[cluster_name].guest_os].yum_list }}"
+              register: result
+              until:    result is succeeded
+              become:   true
+              when:     patroni_packages[clusters.definition[cluster_name].guest_os].yum_list is defined
+
+          when: cloud_images[clusters.definition[cluster_name].guest_os].package_manager == 'yum'
+
+        - name: Patroni setup -- Processing Debian like VM 
+          block:
+            - name: Patroni setup -- Applying apt package
+              apt:
+                name:   "{{ item.name }}"
+                state:  "{{ item.state }}"
+              loop:     "{{  patroni_packages[clusters.definition[cluster_name].guest_os].apt_list }}"
+              register: result
+              until:    result is succeeded
+              become:   true
+              when:     patroni_packages[clusters.definition[cluster_name].guest_os].apt_list is defined
+
+          when: cloud_images[clusters.definition[cluster_name].guest_os].package_manager == 'apt'
+
+        - name: Patroni setup -- Configuring Firewalld
+          block:
+
+            #
+            # https://github.com/ansible/ansible/issues/71528 => using shell command :-S
+            #
+            #   - name: Patroni setup -- Enable and start firewalld daemon
+            #     systemd:
+            #       name:          firewalld
+            #       state:         started
+            #       enabled:       yes
+            #     become:          true
+            #
+        
+            - name: Patroni setup -- Enable firewalld daemon
+              command:         systemctl enable firewalld
+              become:          true
+    
+            - name: Patroni setup -- Start firewalld daemon
+              command:         systemctl start firewalld
+              become:          true
+    
+            - name: Patroni setup -- Firewalld - Adding network interface to the internal zone
+              firewalld:
+                zone:              public
+                interface:         "{{ ansible_default_ipv4.interface  }}"
+                permanent:         true
+                state:             enabled
+
+            - name: Patroni setup -- Firewalld - Allowing patroni rest port
+              firewalld:
+                zone:             public
+                state:            enabled
+                permanent:        true
+                port:             8008/tcp
+            
+            - name: Patroni setup -- Relaunching Firewalld as zone has been created
+              command:         systemctl restart firewalld
+              become:          true
+    
+
+          become:   true
+          when: cloud_images[clusters.definition[cluster_name].guest_os].application_firewall == 'firewalld'
+
+        - name: Patroni setup -- Configuring Ufw
+          block:
+            - name: Patroni setup -- Activating ufw as allowing by default
+              ufw:
+                state:             enabled
+                policy:            allow
+
+            - name: Patroni setup -- Ufw - Allowing SSH
+              ufw:
+                rule:              allow
+                name:              OpenSSH
+                interface:         "{{ ansible_default_ipv4.interface  }}"
+                direction:         in
+
+            - name: Patroni setup -- Ufw - Allowing patroni rest port
+              ufw:
+                rule:              allow
+                port:              '8008'
+                proto:             tcp
+                interface:         "{{ ansible_default_ipv4.interface  }}"
+                direction:         in
+
+            - name: Patroni setup -- Activating ufw as rejecting by default
+              ufw:
+                state:             enabled
+                policy:            reject
+
+          become:   true
+          when: cloud_images[clusters.definition[cluster_name].guest_os].application_firewall == 'ufw'
+
+
+        - name: Patroni setup -- Applying patroni installation command using python
+          shell:    "{{ item }}"
+          loop:     "{{  patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd }}"
+          when:     patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd is defined
+          become:   true
+
+        - name: Patroni setup -- reload systemd configuration
+          command:         systemctl daemon-reload
+          become:          true
+    
+#        - name: Patroni setup -- Enable etcd deamon
+#          command:         systemctl enable postgresql
+#          become:          true
+    
+#        - name: Patroni setup -- stopping postgresql daemon until HA has not yet been configured
+#          command:         systemctl stop postgresql
+#          become:          true
+
+#    - name: Patroni setup -- Storing new state inside the homelab-postgresql-provider custom fact
+#      lineinfile:
+#        path:   /etc/ansible/facts.d/homelab-postgresql-provider.fact
+#        line:   "patroni=true"
+#      become:   true
+
+        - name: Patroni setup -- Reload the homelab-postgresql-provider custom fact
+          setup:
+            filter: ansible_local          
+
+      when: 
+        - ansible_local['homelab-postgresql-provider']['setup']['patroni'] is not defined

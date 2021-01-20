@@ -1,0 +1,29 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+postgresql_server_packages:
+  "Ubuntu 20.04":
+    apt_list:
+      - { state: "present", name: "postgresql"              }  
+      - { state: "present", name: "python3-psycopg2"        }  
+
+  "Ubuntu 20.10":
+    apt_list:
+      - { state: "present", name: "postgresql"              }  
+      - { state: "present", name: "python3-psycopg2"        }  
+
+  "CentOS 7":
+    yum_list:
+      - { state: "present", name: "postgresql"              }  
+      - { state: "present", name: "python3-psycopg2"        }  
+
+  "CentOS 8 Stream":
+    yum_list:
+      - { state: "present", name: "postgresql"              }  
+      - { state: "present", name: "python3-psycopg2"        }  
+
