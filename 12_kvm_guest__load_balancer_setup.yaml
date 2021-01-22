@@ -119,6 +119,20 @@
                 permanent:        true
                 port:             9000/tcp
             
+            - name: Load balancer setup -- Firewalld - Allowing etcd-client service 
+              firewalld:
+                zone:             public
+                state:            enabled
+                permanent:        true
+                port:             2379/tcp
+            
+            - name: Load balancer VRRP setup -- Firewalld - Allowing postgresql service 
+              firewalld:
+                zone:             public
+                state:            enabled
+                permanent:        true
+                port:             5000/tcp
+            
             - name: Load balancer setup -- Relaunching Firewalld as zone has been created
               command:         systemctl restart firewalld
               become:          true
@@ -149,6 +163,22 @@
                 interface:         "{{ ansible_default_ipv4.interface  }}"
                 direction:         in
 
+            - name: Load balancer VRRP setup -- Ufw - Allowing etcd-client service
+              ufw:
+                rule:              allow
+                port:              2379
+                proto:             tcp
+                interface:         "{{ ansible_default_ipv4.interface  }}"
+                direction:         in
+
+            - name: Load balancer VRRP setup -- Ufw - Allowing postgresql service
+              ufw:
+                rule:              allow
+                port:              5000
+                proto:             tcp
+                interface:         "{{ ansible_default_ipv4.interface  }}"
+                direction:         in
+
             - name: Load balancer setup -- Activating ufw as rejecting by default
               ufw:
                 state:             enabled
@@ -167,6 +197,18 @@
           template:
             src:               templates/haproxy/01_haproxy_stats.cfg.j2
             dest:              /etc/haproxy/01_haproxy_stats.cfg
+          become:   true
+
+        - name: Load balancer setup -- Creating haproxy configuration - etcd-client
+          template:
+            src:               templates/haproxy/30_haproxy_etcd_client.cfg.j2
+            dest:              /etc/haproxy/30_haproxy_etcd_client.cfg
+          become:   true
+
+        - name: Load balancer setup -- Creating haproxy configuration - postgresql
+          template:
+            src:               templates/haproxy/40_haproxy_postgresql.cfg.j2
+            dest:              /etc/haproxy/40_haproxy_postgresql.cfg
           become:   true
 
         - name: Load balancer setup -- Comment default configuration
@@ -205,6 +247,8 @@
             echo 'OPTIONS="
             -f /etc/haproxy/00_haproxy_main.cfg 
             -f /etc/haproxy/01_haproxy_stats.cfg 
+            -f /etc/haproxy/30_haproxy_etcd_client.cfg
+            -f /etc/haproxy/40_haproxy_postgresql.cfg
             "' >> {{ cloud_images[clusters.definition[cluster_name].guest_os].haproxy_extra_arg_file }}
           when:        ansible_distribution == 'CentOS' and ansible_distribution_major_version == '7'
           become:      true

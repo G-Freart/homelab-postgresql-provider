@@ -1,0 +1,26 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+#---------------------------------------------------------------------
+#                Kubernetes control plane settings
+#---------------------------------------------------------------------
+
+frontend etcd-client
+    bind *:2379
+    default_backend etcd-client
+    mode tcp
+    option tcplog
+
+backend etcd-client
+    balance roundrobin
+    mode tcp
+
+{% for host in groups['nodes'] %}
+    server {{ "etcd%02d" | format (loop.index) }} {{ hostvars[host].ansible_default_ipv4.address }}:2379 check fall 3 rise 2
+{% endfor %}
+

@@ -14,33 +14,178 @@
     
   tasks:
 
+    - block:
+        - name: Loading CentOS 7 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/centos-7.yaml
+            name:        c7x
+        - name: Loading CentOS 8 Stream cluster samples
+          include_vars:
+            file:        vars/testlab_samples/centos-8-stream.yaml
+            name:        c8s
+        - name: Loading Ubuntu 20.04 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/ubuntu-20.04.yaml
+            name:        u2004
+        - name: Loading Ubuntu 20.10 cluster samples
+          include_vars:
+            file:        vars/testlab_samples/ubuntu-20.10.yaml
+            name:        u2010
+        - name: Loading Your custom cluster definition
+          include_vars:
+            file:        vars/clusters.yaml
+            name:        custo
+        - name: Merging all cluster definitions
+          set_fact:
+            clusters: "{{ custo | combine(c7x, recursive=True) | combine(c8s, recursive=True) | combine(u2004, recursive=True) | combine(u2010, recursive=True) }}"
+
     - name: "Cloud instance setting -- Computing instance directory"
       set_fact:
         instance_dir: "instances/{{ lookup('file', '/var/lib/dbus/machine-id') }}"
         
-    - name: "Cloud instance setting -- Creating ssh key directory"
-      file:
-        path:            "{{ instance_dir }}/{{ cluster_name }}/sshkey/"
-        state:           directory
+    - name: "Cloud instance setting -- Check if instance directory already exists"
+      stat:
+        path:            "{{ instance_dir }}/{{ cluster_name }}/"
+      register:          tgt_dir
 
     - name: "Cloud instance setting -- Creating inventory directory"
       file:
         path:            "{{ instance_dir }}/{{ cluster_name }}/inventory/"
         state:           directory
+      when:              tgt_dir.stat.exists == False
+
+    - name: "Cloud instance setting -- Creating kubelet directory"
+      file:
+        path:            "{{ instance_dir }}/{{ cluster_name }}/kubelet/"
+        state:           directory
+      when:              tgt_dir.stat.exists == False
 
     - name: "Cloud instance setting -- Creating terraform directory"
       file:
-        path:            "{{ item }}"
+        path:            "{{ instance_dir }}/{{ cluster_name }}/terraform/{{ item }}"
         state:           directory
       loop:
-        - "{{ instance_dir }}/{{ cluster_name }}/terraform/node"
-        - "{{ instance_dir }}/{{ cluster_name }}/terraform/load_balancer"
+        - "node"
+        - "load_balancer"
 
-    - name: "Cloud instance setting -- Copying terraform templates"
-      copy:
-        src:             "templates/terraform/"
-        dest:            "{{ item }}"
-        remote_src:      true
-      loop:
-        - "{{ instance_dir }}/{{ cluster_name }}/terraform/node"
-        - "{{ instance_dir }}/{{ cluster_name }}/terraform/load_balancer"
+    - name: "Cloud instance setting -- Creating secret directory"
+      file:
+        path:            "{{ instance_dir }}/{{ cluster_name }}/secret/"
+        state:           directory
+        mode:            "0700"
+      when:              tgt_dir.stat.exists == False
+
+    - name: "Cloud instance setting -- Preparing terraform templates"
+      block:
+        - name: "Cloud instance setting -- Preparing terraform templates - copying all files"
+          copy:
+            src:             "templates/terraform/"
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/terraform/{{ item }}"
+            remote_src:      true
+          loop:
+            - "node"
+            - "load_balancer"
+
+        - name: "Cloud instance setting -- Preparing terraform templates - removing kvm_guest.tf.j2 file"
+          file:
+            path:            "{{ instance_dir }}/{{ cluster_name }}/terraform/{{ item }}/kvm_guest.tf.j2"
+            state:           "absent"
+          loop:
+            - "node"
+            - "load_balancer"
+
+        - name: "Cloud instance setting -- Preparing terraform templates - Setting fact about secondary network bridge"
+          set_fact:
+            secondary_network: "{{ clusters.definition[cluster_name].load_balancers.vrrp.external.bridge }}"
+          when: 
+            - clusters.definition[cluster_name].load_balancers.vrrp                 is defined
+            - clusters.definition[cluster_name].load_balancers.vrrp.external        is defined
+            - clusters.definition[cluster_name].load_balancers.vrrp.external.bridge is defined
+
+        - name: "Cloud instance setting -- Preparing terraform templates - Setting fact about VMs type allowed for secondary network"
+          set_fact:
+            secondary_item_type: "load_balancer"
+          when: 
+            - clusters.definition[cluster_name].load_balancers.vrrp                 is defined
+            - clusters.definition[cluster_name].load_balancers.vrrp.external        is defined
+            - clusters.definition[cluster_name].load_balancers.vrrp.external.bridge is defined
+
+        - name: "Cloud instance setting -- Preparing terraform templates - templating kvm_guest.tf file"
+          template:
+            src:             "templates/terraform/kvm_guest.tf.j2"
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/terraform/{{ item }}/kvm_guest.tf"
+          loop:
+            - "node"
+            - "load_balancer"
+
+        - name: "Cloud instance setting -- Generating VM password of {{ username }}"
+          set_fact:
+            password:        "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+          when:              password is not defined
+
+        - name: "Cloud instance setting -- Storing VM password of {{ username }}"
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/password.txt"
+            content:         "{{ password }}"
+
+        - name: Cloud instance setting -- Generating patroni admin password
+          set_fact:
+            patroni_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+          when:              patroni_password is not defined
+
+        - name: Cloud instance setting -- Storing patroni admin password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/patroni_password.txt"
+            content:         "{{ patroni_password }}"
+
+        - name: Cloud instance setting -- Generating postgresql replication user password
+          set_fact:
+            pgsql_replication_password: "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+          when:              pgsql_replication_password is not defined
+
+        - name: Cloud instance setting -- Storing postgresql replication user password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/pgsql_replication_password.txt"
+            content:         "{{ pgsql_replication_password }}"
+
+        - name: Cloud instance setting -- Generating postgresql rewind password
+          set_fact:
+            pgsql_rewind_password:        "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+          when:              pgsql_rewind_password is not defined
+
+        - name: Cloud instance setting -- Storing postgresql rewind password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/pgsql_rewind_password.txt"
+            content:         "{{ pgsql_rewind_password }}"
+            
+        - name: Cloud instance setting -- Generating postgresql superuser password
+          set_fact:
+            pgsql_superuser_password:        "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=16') }}"
+          when:              pgsql_superuser_password is not defined
+
+        - name: Cloud instance setting -- Storing postgresql superuser password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/pgsql_superuser_password.txt"
+            content:         "{{ pgsql_superuser_password }}"
+            
+        - name: Cloud instance setting -- Generating VRRP internal password
+          set_fact:
+            vrrp_internal_password:        "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=8') }}"
+          when:              vrrp_internal_password is not defined
+
+        - name: Cloud instance setting -- Storing VRRP internal password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/vrrp_internal_password.txt"
+            content:         "{{ vrrp_internal_password }}"
+            
+        - name: Cloud instance setting -- Generating VRRP external password
+          set_fact:
+            vrrp_external_password:        "{{ lookup('password', '/dev/null chars=ascii_letters,digits length=8') }}"
+          when:              vrrp_external_password is not defined
+
+        - name: Cloud instance setting -- Storing VRRP external password
+          copy:
+            dest:            "{{ instance_dir }}/{{ cluster_name }}/secret/vrrp_external_password.txt"
+            content:         "{{ vrrp_external_password }}"
+            
+      when:              tgt_dir.stat.exists == False

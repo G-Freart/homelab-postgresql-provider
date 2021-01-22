@@ -1,0 +1,31 @@
+# ------------------------------------------------------------------------------------------ #
+#                                                                                            #
+#                Copyright (c) 2021 - Gilles Freart. All right reserved                      #
+#                                                                                            #
+#  Licensed under the MIT License. See LICENSE in the project root for license information.  #
+#                                                                                            #
+# ------------------------------------------------------------------------------------------ #
+
+#---------------------------------------------------------------------
+#                Kubernetes control plane settings
+#---------------------------------------------------------------------
+
+listen postgresql
+    bind *:5000
+
+    option httpchk
+
+    timeout client 30m
+    timeout connect 4s
+    timeout server 30m
+    timeout check 5s
+
+    http-check expect status 200
+
+    default-server inter 3s fall 3 rise 2 on-marked-down shutdown-sessions
+
+
+{% for host in groups['nodes'] %}
+    server {{ hostvars[host].ansible_fqdn }} {{ hostvars[host].ansible_default_ipv4.address }}:5432 maxconn 100 check port 8008
+{% endfor %}
+

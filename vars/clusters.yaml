@@ -22,11 +22,24 @@ definition:
       disk:             60
 
     load_balancers:
-      vms:              1
+      vms:              2
       vcpu:             1
       mem:              4
       disk:             30
 
+      vrrp:
+
+        internal:
+          iface:        ens3
+          route_id:     3
+          vip:          192.168.1.3/24
+
+        external:
+          iface:        ens4
+          route_id:     104
+          vip:          192.168.0.104/24
+          bridge:       host-bridge
+      
     network:
       iface:            ens3
       network_cidr:     192.168.1.0/24

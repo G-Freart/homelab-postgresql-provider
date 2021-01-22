@@ -12,18 +12,16 @@
 
 cluster_name:                   sagittarius
 username:                       gilfre5
-password:                       gilfre5
 keymap:                         be-latin1
 timezone:                       Europe/Brussels
 
 patroni_data_dir:               /opt/patroni/data
+patroni_socket_dir:             /opt/patroni/socket
 patroni_username:               admin
-patroni_password:               admin-password
 
 pgsql_replication_username:     replicator
-pgsql_replication_password:     replicator-password
 pgsql_superuser_username:       postgres
-pgsql_superuser_password:       postgres-password
+pgsql_rewind_username:          rewind
 
 libvirt_storage_pool_path:      /var/lib/libvirt/images
 libvirt_cloud_image_path:       /var/lib/libvirt/iso_masters

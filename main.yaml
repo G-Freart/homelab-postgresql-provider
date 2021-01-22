@@ -18,6 +18,7 @@
 - import_playbook: 10_kvm_host__check_provisionning.yaml
 - import_playbook: 11_kvm_guest__prerequisites.yaml
 - import_playbook: 12_kvm_guest__load_balancer_setup.yaml
-- import_playbook: 13_kvm_guest__etc_setup.yaml  
-- import_playbook: 14_kvm_guest__postgresql_install.yaml
-- import_playbook: 15_kvm_guest__patroni_setup.yaml
+- import_playbook: 13_kvm_guest__load_balancer_vrrp_setup.yaml
+- import_playbook: 14_kvm_guest__etcd_setup.yaml  
+- import_playbook: 15_kvm_guest__postgresql_install.yaml
+- import_playbook: 16_kvm_guest__patroni_setup.yaml

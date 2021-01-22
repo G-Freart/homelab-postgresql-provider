@@ -44,6 +44,10 @@
       set_fact:
         instance_dir: "instances/{{ lookup('file', '/var/lib/dbus/machine-id') }}"
         
+    - name: Load balancer provisionning -- Retreiving password
+      set_fact:
+        password:                      "{{ lookup ('file', instance_dir + '/' + cluster_name + '/secret/password.txt') }}"
+
     - terraform:
         project_path:                  "{{ instance_dir }}/{{ cluster_name }}/terraform/load_balancer"
         force_init:                    true
@@ -60,7 +64,7 @@
           vm_count:                    "{{ clusters.definition[cluster_name].load_balancers.vms }}"
           cloud_init_file:             "{{ cloud_images[clusters.definition[cluster_name].guest_os]['cloud_init_file'] }}" 
           os_image_path:               "{{ libvirt_node_image_path  }}/{{ cluster_name }}/{{ cloud_images[clusters.definition[cluster_name].guest_os]['image_name'] }}-load-balancer.qcow2"
-          id_rsa_pub_path:             "../../sshkey/id_rsa.pub"
+          id_rsa_pub_path:             "~/.ssh/id_rsa.pub"
           username:                    "{{ username }}"
           password:                    "{{ password }}"
         state: present
@@ -73,7 +77,7 @@
         node_hostname:                 '{{ cluster_name }}-load-balancer-{{ "%02d" | format (item + 1) }}.{{ clusters.definition[cluster_name].network.domain }}'
         node_fqdn:                     '{{ cluster_name }}-load-balancer-{{ "%02d" | format (item + 1) }}.{{ clusters.definition[cluster_name].network.domain }}'
         node_mac:                      "{{ output_load_balancers.outputs.macs.value[item]|lower }}"
-        ansible_ssh_private_key_file:  "{{ instance_dir }}/{{ cluster_name }}/sshkey/id_rsa"
+        ansible_ssh_private_key_file:  "~/.ssh/id_rsa"
         ansible_user:                  "{{ username }}"
         ansible_ssh_common_args:       "-o StrictHostKeyChecking=no"
         groups:

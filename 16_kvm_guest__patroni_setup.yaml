@@ -154,30 +154,119 @@
           become:   true
           when: cloud_images[clusters.definition[cluster_name].guest_os].application_firewall == 'ufw'
 
+        - name: Patroni setup -- Computing etcdl-client endpoint as VIP if available
+          set_fact: etcd_client_endpoint_address="{{ clusters.definition[cluster_name].load_balancers.vrrp.internal.vip | ipaddr('address') }}"
+          when:     
+            - clusters.definition[cluster_name].load_balancers.vrrp              is defined
+            - clusters.definition[cluster_name].load_balancers.vrrp.internal     is defined 
+            - clusters.definition[cluster_name].load_balancers.vrrp.internal.vip is defined
 
+        - name: Patroni setup -- etcdl-client endpoint endpoint as server ip if vip not available
+          set_fact: etcd_client_endpoint_address="{{ hostvars[groups['load_balancers'][0]].inventory_hostname }}"
+          when:     
+            - etcd_client_endpoint_address is not defined
+
+        - name: Patroni setup -- Output of the etcd-client endpoint address
+          debug:
+            var: etcd_client_endpoint_address 
+
+        - name: Patroni setup -- Retreiving passwords
+          set_fact:
+            patroni_password:           "{{ lookup ('file', instance_dir + '/' + cluster_name + '/secret/patroni_password.txt')           }}"
+            pgsql_replication_password: "{{ lookup ('file', instance_dir + '/' + cluster_name + '/secret/pgsql_replication_password.txt') }}"
+            pgsql_superuser_password:   "{{ lookup ('file', instance_dir + '/' + cluster_name + '/secret/pgsql_superuser_password.txt')   }}"
+            pgsql_rewind_password:      "{{ lookup ('file', instance_dir + '/' + cluster_name + '/secret/pgsql_rewind_password.txt')      }}"
+            
         - name: Patroni setup -- Applying patroni installation command using python
-          shell:    "{{ item }}"
-          loop:     "{{  patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd }}"
-          when:     patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd is defined
-          become:   true
+          shell:           "{{ item }}"
+          loop:            "{{  patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd }}"
+          when:            patroni_packages[clusters.definition[cluster_name].guest_os].patroni_install_cmd is defined
+          become:          true
 
+        - name: Patroni setup -- Creating /etc/patroni/ directory
+          file:
+            path:          /etc/patroni
+            state:         directory
+            mode:          "0755"
+          become:          true
+       
+        - name: Patroni setup -- Creating patroni data directory
+          file:
+            path:          "{{ patroni_data_dir }}"
+            state:         directory
+          become:          true
+          
+        - name: Patroni setup -- Creating patroni socket directory
+          file:
+            path:          "{{ patroni_socket_dir }}"
+            state:         directory
+          become:          true
+          
+        - name: Patroni setup -- Adjusting patroni data directory right
+          file:
+            path:          "{{ patroni_data_dir }}"
+            state:         directory
+            mode:          "0700"
+            owner:         postgres
+            group:         postgres
+          become:          true
+          
+        - name: Patroni setup -- Adjusting patroni socket directory right
+          file:
+            path:          "{{ patroni_socket_dir }}"
+            state:         directory
+            mode:          "0755"
+            owner:         postgres
+            group:         postgres
+          become:          true
+          
+        - name: Patroni setup -- Retreiving postgresql binary directory
+          shell:           "cd /usr/lib/postgresql/*/bin && pwd"
+          register:        pgsql_bin_dir_result
+
+        - name: Patroni setup -- Registering fact on pgsql_bin_dir
+          set_fact:
+            pgsql_bin_dir: "{{ pgsql_bin_dir_result.stdout }}"      
+
+        - name: Patroni setup -- Creating patroni configuration file
+          template:
+            src:           templates/patroni/patroni.service.j2
+            dest:          /etc/systemd/system/patroni.service
+          become:          true
+          
+        - name: Patroni setup -- Creating patroni configuration file
+          template:
+            src:           templates/patroni/patroni.yaml.j2
+            dest:          /etc/patroni/patroni.yaml
+          become:          true
+          
+        - name: Patroni setup -- Creating patroni global environment setting
+          template:
+            src:           templates/patroni/patroni.sh.j2
+            dest:          /etc/profile.d/patroni.sh
+          become:          true
+          
         - name: Patroni setup -- reload systemd configuration
           command:         systemctl daemon-reload
           become:          true
     
-#        - name: Patroni setup -- Enable etcd deamon
-#          command:         systemctl enable postgresql
-#          become:          true
+        - name: Patroni setup -- Enable postgresql deamon
+          command:         systemctl enable postgresql
+          become:          true
     
-#        - name: Patroni setup -- stopping postgresql daemon until HA has not yet been configured
-#          command:         systemctl stop postgresql
-#          become:          true
-
-#    - name: Patroni setup -- Storing new state inside the homelab-postgresql-provider custom fact
-#      lineinfile:
-#        path:   /etc/ansible/facts.d/homelab-postgresql-provider.fact
-#        line:   "patroni=true"
-#      become:   true
+        - name: Patroni setup -- Enable patroni deamon
+          command:         systemctl enable patroni
+          become:          true
+    
+        - name: Patroni setup -- Start patroni deamon
+          command:         systemctl start patroni
+          become:          true
+    
+        - name: Patroni setup -- Storing new state inside the homelab-postgresql-provider custom fact
+          lineinfile:
+            path:   /etc/ansible/facts.d/homelab-postgresql-provider.fact
+            line:   "patroni=true"
+          become:   true
 
         - name: Patroni setup -- Reload the homelab-postgresql-provider custom fact
           setup:

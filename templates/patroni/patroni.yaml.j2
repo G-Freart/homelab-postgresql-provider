@@ -1,0 +1,70 @@
+scope:                                   {{ cluster_name }}
+namespace:                               /service
+{% for host in groups['nodes'] %}{% if inventory_hostname == hostvars[host].inventory_hostname %}
+name:                                    {{ "patroni%02d" | format (loop.index) }}
+
+restapi:
+    listen:                              {{ hostvars[host].ansible_default_ipv4.address }}:8008
+    connect_address:                     {{ hostvars[host].ansible_default_ipv4.address }}:8008
+{% endif %}{% endfor %}
+
+etcd:
+    host:                                {{ etcd_client_endpoint_address}}:2379
+
+bootstrap:
+    dcs:
+        ttl:                             30
+        loop_wait:                       10
+        retry_timeout:                   10
+        maximum_lag_on_failover:         1048576
+        postgresql:
+            use_pg_rewind:               true
+
+    initdb:
+    - encoding:                          UTF8
+    - data-checksums
+
+    users:
+        {{ patroni_username }}:
+            password:                    "{{ patroni_password }}"
+            options:
+                - createrole
+                - createdb
+
+postgresql:
+{% for host in groups['nodes'] %}{% if inventory_hostname == hostvars[host].inventory_hostname %}
+    listen:                              {{ hostvars[host].ansible_default_ipv4.address }}:5432
+    connect_address:                     {{ hostvars[host].ansible_default_ipv4.address }}:5432
+{% endif %}{% endfor %}
+    bin_dir:                             {{ pgsql_bin_dir }}
+    data_dir:                            {{ patroni_data_dir }}
+    config_dir:                          {{ patroni_data_dir }}
+    pgpass:                              /tmp/pgpass
+
+    pg_hba:
+        - host replication replicator    127.0.0.1/32 md5
+{% for host in groups['nodes'] %}
+        - host replication replicator    {{ hostvars[host].ansible_default_ipv4.address }}/0 md5
+{% endfor %}
+        - host all         all           0.0.0.0/0 md5
+
+    authentication:
+
+        replication:
+            username:                    {{ pgsql_replication_username }}
+            password:                    "{{ pgsql_replication_password }}"
+        superuser:
+            username:                    {{ pgsql_superuser_username }}
+            password:                    "{{ pgsql_superuser_password }}"
+        rewind:
+            username:                    {{ pgsql_rewind_username }}
+            password:                    "{{ pgsql_rewind_password }}"
+
+    parameters:
+        unix_socket_directories:         {{ patroni_socket_dir }}
+
+tags:
+    nofailover:                          false
+    noloadbalance:                       false
+    clonefrom:                           false
+    nosync:                              false
