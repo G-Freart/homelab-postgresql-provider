@@ -1,5 +1,4 @@
 scope:                                   {{ cluster_name }}
-namespace:                               /service
 {% for host in groups['nodes'] %}{% if inventory_hostname == hostvars[host].inventory_hostname %}
 name:                                    {{ "patroni%02d" | format (loop.index) }}
 
@@ -19,16 +18,23 @@ bootstrap:
         maximum_lag_on_failover:         1048576
         postgresql:
             use_pg_rewind:               true
+            use_slot:                    true
 
     initdb:
     - encoding:                          UTF8
-{% if ansible_distribution != 'CentOS' or ansible_distribution_major_version != '7' %}
     - data-checksums
-{% endif %}
+
+    pg_hba:
+        - local all         all           md5
+        - host  replication replicator    127.0.0.1/32 md5
+{% for host in groups['nodes'] %}
+        - host  replication replicator    {{ hostvars[host].ansible_default_ipv4.address }}/32 md5
+{% endfor %}
+        - host  all         all           0.0.0.0/0 md5
 
     users:
         {{ patroni_username }}:
-            password:                    "{{ patroni_password }}"
+            password:                        "{{ patroni_password }}"
             options:
                 - createrole
                 - createdb
@@ -38,20 +44,11 @@ postgresql:
     listen:                              {{ hostvars[host].ansible_default_ipv4.address }}:5432
     connect_address:                     {{ hostvars[host].ansible_default_ipv4.address }}:5432
 {% endif %}{% endfor %}
-    bin_dir:                             {{ pgsql_bin_dir }}
     data_dir:                            {{ patroni_data_dir }}
-    config_dir:                          {{ patroni_data_dir }}
+    bin_dir:                             {{ pgsql_bin_dir }}
+#   config_dir:                          {{ pgsql_bin_dir }}
     pgpass:                              /tmp/pgpass
-
-    pg_hba:
-        - host replication replicator    127.0.0.1/32 md5
-{% for host in groups['nodes'] %}
-        - host replication replicator    {{ hostvars[host].ansible_default_ipv4.address }}/0 md5
-{% endfor %}
-        - host all         all           0.0.0.0/0 md5
-
     authentication:
-
         replication:
             username:                    {{ pgsql_replication_username }}
             password:                    "{{ pgsql_replication_password }}"
@@ -61,9 +58,8 @@ postgresql:
         rewind:
             username:                    {{ pgsql_rewind_username }}
             password:                    "{{ pgsql_rewind_password }}"
-
     parameters:
-        unix_socket_directories:         {{ patroni_socket_dir }}
+        unix_socket_directories:         "{{ patroni_socket_dir }}"
 
 tags:
     nofailover:                          false

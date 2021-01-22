@@ -14,7 +14,7 @@ global
     log                     127.0.0.1 local0
     chroot      	    /var/lib/haproxy
     pidfile                 /var/run/haproxy.pid
-    maxconn                 4000
+    maxconn                 500
     user                    haproxy
     group                   haproxy
     daemon
@@ -26,19 +26,11 @@ global
 #---------------------------------------------------------------------
 
 defaults
-    mode                    http
+    mode                    tcp
     log                     global
-    option                  httplog
-    option                  dontlognull
-    #option http-server-close
-    option                  redispatch
-    retries                 3
-    timeout http-request    10s
-    timeout queue           1m
-    timeout connect         10s
-    timeout client          1m
-    timeout server          1m
-    timeout http-keep-alive 10s
-    timeout check           10s
-    maxconn                 3000
+    retries                 2
+    timeout connect         4s
+    timeout client          30m
+    timeout server          30m
+    timeout check           5s
 
