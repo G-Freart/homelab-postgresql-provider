@@ -15,13 +15,13 @@ definition:
     guest_os:           'Ubuntu 20.10'
 
     nodes:
-      vms:              2
+      vms:              3
       vcpu:             2
       mem:              2
       disk:             20
 
     load_balancers:
-      vms:              1
+      vms:              2
       vcpu:             2
       mem:              2
       disk:             20

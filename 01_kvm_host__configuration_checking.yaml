@@ -40,6 +40,10 @@
           set_fact:
             clusters: "{{ custo | combine(c7x, recursive=True) | combine(c8s, recursive=True) | combine(u2004, recursive=True) | combine(u2010, recursive=True) }}"
 
+    - name: Configuration checking -- Showing cluster name
+      debug:
+        var: cluster_name
+
     - name: Configuration checking -- Check ansible minimum version
       fail:
         msg: 'Your ansible version should be at least 2.9.0 but was {{ ansible_version.full  }}'
