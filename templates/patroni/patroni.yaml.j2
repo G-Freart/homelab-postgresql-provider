@@ -22,7 +22,9 @@ bootstrap:
 
     initdb:
     - encoding:                          UTF8
+{% if ansible_distribution != 'CentOS' or ansible_distribution_major_version != '7' %}
     - data-checksums
+{% endif %}
 
     users:
         {{ patroni_username }}:

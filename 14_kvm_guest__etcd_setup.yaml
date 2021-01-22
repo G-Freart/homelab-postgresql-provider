@@ -6,7 +6,7 @@
 #                                                                                            #
 # ------------------------------------------------------------------------------------------ #
 
-- name:     This playbook will configure the etc cluster
+- name:     This playbook will configure the etcd cluster
   hosts:    nodes
 
   vars_files:
@@ -95,12 +95,12 @@
             #
         
             - name: ETCD setup -- Enable firewalld daemon
-              command:         systemctl enable firewalld
-              become:          true
+              command:            systemctl enable firewalld
+              become:             true
     
             - name: ETCD setup -- Start firewalld daemon
-              command:         systemctl start firewalld
-              become:          true
+              command:            systemctl start firewalld
+              become:             true
     
             - name: ETCD setup -- Firewalld - Adding network interface to the internal zone
               firewalld:
@@ -170,11 +170,11 @@
           when: cloud_images[clusters.definition[cluster_name].guest_os].application_firewall == 'ufw'
 
 
-        - name: ETCD setup -- Creating etcd configuration
+        - name: "ETCD setup -- Creating etcd configuration at {{ etcd_packages[clusters.definition[cluster_name].guest_os].configuration_file }}"
           template:
-            src:               templates/etcd/etcd.j2
-            dest:              /etc/default/etcd
-          become:   true
+            src:           templates/etcd/etcd.j2
+            dest:          "{{ etcd_packages[clusters.definition[cluster_name].guest_os].configuration_file }}"
+          become:          true
           
         - name: ETCD setup -- reload systemd configuration
           command:         systemctl daemon-reload

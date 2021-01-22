@@ -54,6 +54,20 @@
 
         - name: PostgreSQL setup -- Processing Red-Hat like VM
           block:
+            - name: PostgreSQL setup -- Applying yum repo package
+              yum:
+                name:   "{{ postgresql_server_packages[clusters.definition[cluster_name].guest_os].yum_repo }}"
+                state:  "present"
+              when:     postgresql_server_packages[clusters.definition[cluster_name].guest_os].yum_repo is defined
+              become:   true
+
+            - name: PostgreSQL setup -- Applying post repo command
+              shell:
+                cmd:    "{{ postgresql_server_packages[clusters.definition[cluster_name].guest_os].cmd_repo }}"
+                warn:   false
+              when:     postgresql_server_packages[clusters.definition[cluster_name].guest_os].cmd_repo is defined
+              become:   true
+
             - name: PostgreSQL setup -- Applying yum package
               yum:
                 name:   "{{ item.name }}"
@@ -61,8 +75,8 @@
               loop:     "{{  postgresql_server_packages[clusters.definition[cluster_name].guest_os].yum_list }}"
               register: result
               until:    result is succeeded
-              become:   true
               when:     postgresql_server_packages[clusters.definition[cluster_name].guest_os].yum_list is defined
+              become:   true
 
           when: cloud_images[clusters.definition[cluster_name].guest_os].package_manager == 'yum'
 
@@ -75,8 +89,8 @@
               loop:     "{{  postgresql_server_packages[clusters.definition[cluster_name].guest_os].apt_list }}"
               register: result
               until:    result is succeeded
-              become:   true
               when:     postgresql_server_packages[clusters.definition[cluster_name].guest_os].apt_list is defined
+              become:   true
 
           when: cloud_images[clusters.definition[cluster_name].guest_os].package_manager == 'apt'
 
@@ -159,12 +173,24 @@
           command:         systemctl daemon-reload
           become:          true
     
-        - name: PostgreSQL setup -- Enable etcd deamon
-          command:         systemctl enable postgresql
+        - name: Patroni setup -- Enable postgresql deamon under CentOS
+          command:         systemctl enable postgresql-12
+          when:            ansible_distribution == 'CentOS' 
           become:          true
     
-        - name: PostgreSQL setup -- stopping postgresql daemon until HA has not yet been configured
+        - name: Patroni setup -- Enable postgresql deamon under Ubuntu
+          command:         systemctl enable postgresql
+          when:            ansible_distribution == 'Ubuntu' 
+          become:          true
+    
+        - name: PostgreSQL setup -- stopping postgresql daemon until HA has not yet been configured under CentOS
+          command:         systemctl stop postgresql-12
+          when:            ansible_distribution == 'CentOS' 
+          become:          true
+
+        - name: PostgreSQL setup -- stopping postgresql daemon until HA has not yet been configured under Ubuntu
           command:         systemctl stop postgresql
+          when:            ansible_distribution == 'Ubuntu' 
           become:          true
 
         - name: PostgreSQL setup -- Storing new state inside the homelab-postgresql-provider custom fact

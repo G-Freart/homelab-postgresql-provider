@@ -20,14 +20,18 @@ postgresql_server_packages:
       - { state: "present", name: "python3-psycopg2"        }  
 
   "CentOS 7":
+    yum_repo: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-7-x86_64/pgdg-redhat-repo-latest.noarch.rpm" 
+    cmd_repo: "yum-config-manager --enable pgdg12"
     yum_list:
-      - { state: "present", name: "postgresql"              }  
-      - { state: "present", name: "postgresql-common"       }  
+      - { state: "present", name: "postgresql12"            }  
+      - { state: "present", name: "postgresql12-server"     }  
       - { state: "present", name: "python3-psycopg2"        }  
 
   "CentOS 8 Stream":
+    yum_repo: "https://download.postgresql.org/pub/repos/yum/reporpms/EL-8-x86_64/pgdg-redhat-repo-latest.noarch.rpm" 
+    cmd_repo: "dnf -qy module disable postgresql"
     yum_list:
-      - { state: "present", name: "postgresql"              }  
-      - { state: "present", name: "postgresql-common"       }  
+      - { state: "present", name: "postgresql12"            }  
+      - { state: "present", name: "postgresql12-server"     }  
       - { state: "present", name: "python3-psycopg2"        }  
 

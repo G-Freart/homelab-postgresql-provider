@@ -45,7 +45,7 @@ fi
 
 if [ ! -z "${EXTRA_VARS}" ]
 then
-  ansible-playbook main.yaml --extra-var "${EXTRA_VARS}"
+  ansible-playbook main.yaml --extra-var "${EXTRA_VARS}" 
 else  
   ansible-playbook main.yaml
 fi	

@@ -34,7 +34,7 @@ prerequisite_packages:
 
   "CentOS 7":
     yum_list:
-      - { state: "present", name: "epel-release"            }  
+      - { state: "latest",  name: "epel-release"            }  
       - { state: "present", name: "mc"                      }  
       - { state: "present", name: "sed"                     }  
       - { state: "present", name: "vim"                     }  
@@ -44,6 +44,7 @@ prerequisite_packages:
       - { state: "present", name: "telnet"                  }  
       - { state: "present", name: "yum-utils"               }  
       - { state: "present", name: "bash-completion"         }  
+      - { state: "present", name: "firewalld"               }  
       - { state: "absent",  name: "buildah"                 }  
       - { state: "absent",  name: "skopeo"                  }  
       - { state: "absent",  name: "podman"                  }  
@@ -59,7 +60,7 @@ prerequisite_packages:
 
   "CentOS 8 Stream":
     yum_list:
-      - { state: "present", name: "epel-release"            }  
+      - { state: "latest",  name: "epel-release"            }  
       - { state: "present", name: "mc"                      }  
       - { state: "present", name: "sed"                     }  
       - { state: "present", name: "vim"                     }  
@@ -69,6 +70,7 @@ prerequisite_packages:
       - { state: "present", name: "telnet"                  }  
       - { state: "present", name: "yum-utils"               }  
       - { state: "present", name: "bash-completion"         }  
+      - { state: "present", name: "firewalld"               }  
       - { state: "absent",  name: "buildah"                 }  
       - { state: "absent",  name: "skopeo"                  }  
       - { state: "absent",  name: "podman"                  }  

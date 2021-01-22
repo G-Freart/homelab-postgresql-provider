@@ -220,13 +220,31 @@
             group:         postgres
           become:          true
           
-        - name: Patroni setup -- Retreiving postgresql binary directory
-          shell:           "cd /usr/lib/postgresql/*/bin && pwd"
-          register:        pgsql_bin_dir_result
+        - name: Patroni setup -- Computing path to postgresql binary directory under CentOS 7
+          block:
 
-        - name: Patroni setup -- Registering fact on pgsql_bin_dir
-          set_fact:
-            pgsql_bin_dir: "{{ pgsql_bin_dir_result.stdout }}"      
+            - name: Patroni setup -- Retreiving postgresql binary directory under CentOS
+              shell:           "cd /usr/pgsql-*/bin && pwd"
+              register:        pgsql_bin_dir_result
+
+            - name: Patroni setup -- Registering fact on pgsql_bin_dir under CentOS
+              set_fact:
+                pgsql_bin_dir: "{{ pgsql_bin_dir_result.stdout }}"      
+
+          when: ansible_distribution == 'CentOS' 
+
+        - name: Patroni setup -- Computing path to postgresql binary directory 
+          block:
+
+            - name: Patroni setup -- Retreiving postgresql binary directory under Ubuntu
+              shell:           "cd /usr/lib/postgresql/*/bin && pwd"
+              register:        pgsql_bin_dir_result
+
+            - name: Patroni setup -- Registering fact on pgsql_bin_dir under Ubuntu
+              set_fact:
+                pgsql_bin_dir: "{{ pgsql_bin_dir_result.stdout }}"      
+
+          when: ansible_distribution == 'Ubuntu'
 
         - name: Patroni setup -- Creating patroni configuration file
           template:
@@ -248,10 +266,6 @@
           
         - name: Patroni setup -- reload systemd configuration
           command:         systemctl daemon-reload
-          become:          true
-    
-        - name: Patroni setup -- Enable postgresql deamon
-          command:         systemctl enable postgresql
           become:          true
     
         - name: Patroni setup -- Enable patroni deamon
