@@ -94,7 +94,7 @@ When more than one load balancer is defined, one VIP will be configured between 
 using settings put under 'internal' tag. More over, an 'external' could be also configured which allow you to access your cluster
 from outside of it, using the setted KVM  'bridge'
 
-The network part of the file allow you to customize either the KVM network or the K8S network :
+The network part of the file allow you to customize the KVM network :
 * 'iface' must contains the name of the interface created during the terraform process of the VM provisionning :
   * eth0 whenever the guest operating system is a red hat based
   * ens3 whenever the guest operating system is a ubuntu based
