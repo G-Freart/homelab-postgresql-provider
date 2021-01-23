@@ -76,7 +76,7 @@ definition:
       bridge:           homelab
 ```
 
-In this file, andromeda is the name of the cluster.
+In this file, sagittarius is the name of the cluster.
 
 Guest OS could have one of the following value :
 * Ubuntu 20.04
